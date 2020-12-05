@@ -2,13 +2,16 @@
 const nodemailer = require("nodemailer");
 const { send } = require("process");
 
+
 async function main() {
     //let testAccount = await nodemailer.createTestAccount();
-
     let targetEmail = "kaipojames12@gmail.com";
     let wifeyEmail = "adriennehernaez@gmail.com";
     var gmailPassword = process.env.GMAIL_PASSWORD;
-    var messageBody = "envionment variable worked successfulyy!";
+
+    var messageBody = "attachment";
+    var filepath = "./attachments";
+    var filename = "PureVanilla-NetherPortal.png";
 
     let transporter = nodemailer.createTransport({
        //host: "smtp.ethereal.email",
@@ -32,17 +35,15 @@ async function main() {
     var message = {
         from: targetEmail,
         to: targetEmail,
-        subject: "Testing envionment variables",
+        subject: "From NodeMailer",
         text: messageBody,
-        html: "<p>" + messageBody + "</p>"
+        html: "<p>" + messageBody + "</p>",
+        attachments: [{
+            filename: filename,
+            path: filepath + "/" + filename
+        }]
     };
 
-    sendMail(transporter, message);
-
-    //console.log("Message sent: %s", info.messageId);
-}
-
-const sendMail = (transporter, message) => {
     transporter.sendMail(message, (err, data) => {
         if (err) {
             console.log(err);
@@ -50,6 +51,8 @@ const sendMail = (transporter, message) => {
             console.log("Email Sent Successfully!");
         }
     });
+
+    //console.log("Message sent: %s", info.messageId);
 }
 
 main().catch(console.error);
