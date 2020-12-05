@@ -1,10 +1,10 @@
 "use strict";
 const nodemailer = require("nodemailer");
 const { send } = require("process");
+const hbs = require("nodemailer-express-handlebars");
 
 
 async function main() {
-    //let testAccount = await nodemailer.createTestAccount();
     let targetEmail = "kaipojames12@gmail.com";
     let wifeyEmail = "adriennehernaez@gmail.com";
     var gmailPassword = process.env.GMAIL_PASSWORD;
@@ -14,15 +14,16 @@ async function main() {
     var filename = "PureVanilla-NetherPortal.png";
 
     let transporter = nodemailer.createTransport({
-       //host: "smtp.ethereal.email",
-       //port: 587,
-       //secure: false,
        service: 'gmail',
        auth: {
            user: targetEmail,
            pass: gmailPassword,
        },
     });
+    transporter.use('compile', hbs({
+        viewEngine: 'express-handlebars',
+        viewPath: './views/'
+    }))
 
     transporter.verify(function(error, success) {
         if (error) {
