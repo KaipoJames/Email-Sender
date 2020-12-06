@@ -1,4 +1,5 @@
 "use strict";
+const path = require("path");
 const nodemailer = require("nodemailer");
 const { send } = require("process");
 const hbs = require("nodemailer-express-handlebars");
@@ -9,9 +10,22 @@ async function main() {
     let wifeyEmail = "adriennehernaez@gmail.com";
     var gmailPassword = process.env.GMAIL_PASSWORD;
 
-    var messageBody = "attachment";
+    var messageBody = "templates";
     var filepath = "./attachments";
     var filename = "PureVanilla-NetherPortal.png";
+    var viewsPath = path.join(__dirname, "views");
+    console.log("viewsPath = " + viewsPath);
+
+    var options = {
+        viewEngine : {
+            extname: '.handlebars', // handlebars extension
+            layoutsDir: viewsPath, // location of handlebars templates
+            defaultLayout: 'index', // name of main template
+            partialsDir: viewsPath, // location of your subtemplates aka. header, footer etc
+        },
+        viewPath: viewsPath,
+        extName: '.handlebars'
+        };
 
     let transporter = nodemailer.createTransport({
        service: 'gmail',
@@ -20,10 +34,11 @@ async function main() {
            pass: gmailPassword,
        },
     });
-    transporter.use('compile', hbs({
-        viewEngine: 'express-handlebars',
-        viewPath: './views/'
-    }))
+    // transporter.use('compile', hbs({
+    //     viewEngine: 'express-handlebars',
+    //     viewPath: viewsPath,
+    // }))
+    transporter.use('compile', hbs(options));
 
     transporter.verify(function(error, success) {
         if (error) {
@@ -38,11 +53,11 @@ async function main() {
         to: targetEmail,
         subject: "From NodeMailer",
         text: messageBody,
-        html: "<p>" + messageBody + "</p>",
         attachments: [{
             filename: filename,
             path: filepath + "/" + filename
-        }]
+        }],
+        template: 'index'
     };
 
     transporter.sendMail(message, (err, data) => {
